@@ -28,7 +28,8 @@ while True:
       # TCP1 = TCP(sport = source_port, dport = 80)
       UDP1 = UDP(sport = source_port, dport = 80)
       # pkt = IP1 / TCP1
-      pkt = IP1 / UDP1
+      # pkt = IP1 / UDP1
+      pkt = IP1 / ICMP()
       send(pkt,inter = .001)
       print ("packet sent ", i)
       i = i + 1
