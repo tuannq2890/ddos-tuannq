@@ -190,6 +190,7 @@ print("    1: TCP")
 print("    2: UDP\n")
 
 ip_proto = 0
+tcp_flag = 'S'
 while True:
    ip_proto = input("--> You press: ")
    if (ip_proto.isdigit() == False or (int(ip_proto) != 0 and int(ip_proto) != 1 and int(ip_proto) != 2)):
